@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cs-args", "cs-args\cs-args.csproj", "{75490547-FA68-4501-8DB1-FD901D153A49}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cs-argfmt", "cs-argfmt\cs-argfmt.csproj", "{75490547-FA68-4501-8DB1-FD901D153A49}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
