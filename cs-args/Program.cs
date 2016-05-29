@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace cs_args {
+namespace orez {
 	class Program {
 		static void Main(string[] args) {
 			for (int i = 0; i < args.Length; i++)
