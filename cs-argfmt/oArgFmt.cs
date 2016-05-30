@@ -60,12 +60,12 @@ namespace orez.argfmt {
 		/// Saves parameter based on format-table <code>Fmt</code>.
 		/// </summary>
 		public Fn Param = (o, d, di, s, si) => {
-			bool v = di == 0; string k = v ? "" : s[si];
+			bool v = di.Length == 0; string k = v ? "" : s[si];
 			if(o.Fmt != null) for(int i = 0; i < o.Fmt.Count; i++) {
 				IList<object> l = o.Fmt[i];
-				if(l.Contains(k)) return ((Fn)l[l.Count - 1])(o, d, v ? 0 : i, s, v ? si : si + 1);
+				if(l.Contains(k)) return ((Fn)l[l.Count - 1])(o, d, v ? "" : ""+i, s, v ? si : si + 1);
 			}
-			o.List(o, d, d.Count - 1, s, si);
+			o.List(o, d, ""+ (d.Count - 1), s, si);
 			return 0;
 		};
 
@@ -73,23 +73,56 @@ namespace orez.argfmt {
 		/// Saves flag parameter (no value) as empty string at flag character.
 		/// </summary>
 		public Fn Flag = (o, d, di, s, si) => {
-			d[di] = "";
+			d[di[0]] = "";
 			return 0;
 		};
 		/// <summary>
 		/// Saves attribute parameter (1 value, overwrite) as valued string at attribute character.
 		/// </summary>
 		public Fn Attr = (o, d, di, s, si) => {
-			d[di] = s[si];
+			d[di[0]] = s[si];
 			return 1;
 		};
 		/// <summary>
 		/// Saves list parameter (1 value, append) as string list at list character.
 		/// </summary>
 		public Fn List = (o, d, di, s, si) => {
-			IList<string> l = (l = (IList<string>)d[di]) == null ? (IList<string>)(d[di] = new List<string>()) : l;
+			IList<string> l = (l = (IList<string>)d[di[0]]) == null ? (IList<string>)(d[di[0]] = new List<string>()) : l;
 			l.Add(s[si]);
 			return 1;
 		};
+
+
+		public void PFlag(ref string o) {
+			o = "";
+		}
+
+		public void PAttr(ref string o, string v) {
+			o = v;
+		}
+
+		public void PList(List<string> o, string v) {
+			o.Add(v);
+		}
+
+		public void PSplitList(List<string> o, string v, char[] sep) {
+			o.AddRange(v.Split(sep));
+		}
+
+		public void PClosedListAttr(List<string> o, string[] v, string begin, string end) {
+			o.Clear();
+			if (!v[0].StartsWith(begin)) throw new Exception();
+			if (v[0].Length != begin.Length) o.Add(v[0].Substring(begin.Length));
+			for (int i = 1; i < v.Length; i++) {
+				if (v[i].EndsWith(end)) { if (v[i].Length != end.Length) o.Add(v[i].Substring(0, v[i].Length - end.Length)); break; }
+				o.Add(v[i]);
+			}
+		}
+
+		public void PMergeFullAttr(ref string o, string[] v) {
+			o = "";
+			for (int i = 0; i < v.Length; i++)
+				o += v[i];
+		}
 	}
 }
