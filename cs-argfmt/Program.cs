@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace orez {
+namespace orez.argfmt {
 	class Program {
 		static void Main(string[] args) {
 			for (int i = 0; i < args.Length; i++)
