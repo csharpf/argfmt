@@ -5,19 +5,42 @@ namespace orez.argfmt {
 	class oArgFmt {
 
 		// types
-		public delegate int Fn(oArgFmt o, IList<object> dst, int di, IList<string> src, int si);
+		public delegate int Fn(oArgFmt o, IList<object> dst, string di, IList<string> src, int si);
 
 		// data
-		public string LongPrefix = "--";
-		public string ShortPrefix = "-";
+		/// <summary>
+		/// List of parameters, with associated functions.
+		/// </summary>
 		public IList<IList<object>> Fmt;
+		/// <summary>
+		/// Long prefix of parameter.
+		/// </summary>
+		public string LongPrefix = "--";
+		/// <summary>
+		/// Short prefix of parameter.
+		/// </summary>
+		public string ShortPrefix = "-";
 
-		public oArgFmt() {
+		/// <summary>
+		/// Create an argument format object.
+		/// </summary>
+		/// <param name="fmt">List of parameters, with associated functions.</param>
+		/// <param name="longPrefix">Optional. Long prefix of parameter (default = "--").</param>
+		/// <param name="shortPrefix">Optional. Short prefix of parameter (default = "-").</param>
+		public oArgFmt(IList<IList<object>> fmt, string longPrefix = "--", string shortPrefix = "-") {
+			Fmt = fmt;
+			LongPrefix = longPrefix;
+			ShortPrefix = shortPrefix;
 		}
 
-		public void Get(IList<object> m, IList<string> args) {
+		/// <summary>
+		/// Saves the arguments into an indexed list.
+		/// </summary>
+		/// <param name="d">Output indexed list</param>
+		/// <param name="args">Arguments array</param>
+		public void Get(IList<object> d, IList<string> args) {
 			for(int i = 0; i < args.Count; i++)
-				i += OnArg(this, m, 0, args, i+1);
+				i += Arg(this, d, args[i], args, i+1);
 		}
 
 
@@ -25,12 +48,12 @@ namespace orez.argfmt {
 		/// <summary>
 		/// Saves parameter based on its type (<code>LongPrefix</code>, <code>ShortPrefix</code>).
 		/// </summary>
-		public Fn OnArg = (o, d, di, s, si) => {
-			int t = 0; string p = s[si];
-			if(p.StartsWith(o.LongPrefix)) return o.Param(o, d, 1, s, si);
-			else if(!p.StartsWith(o.ShortPrefix)) return o.Param(o, d, 0, s, si);
-			for(int i = o.ShortPrefix.Length; i < p.Length; i++)
-				t += o.Param(o, d, 1, s, si);
+		public Fn Arg = (o, d, di, s, si) => {
+			int t = 0;
+			if(di.StartsWith(o.LongPrefix)) return o.Param(o, d, di.Substring(o.LongPrefix.Length), s, si);
+			else if(!di.StartsWith(o.ShortPrefix)) return o.Param(o, d, di, s, si);
+			for(int i = o.ShortPrefix.Length; i < di.Length; i++)
+				t += o.Param(o, d, di[i].ToString(), s, si);
 			return t;
 		};
 		/// <summary>
@@ -38,7 +61,7 @@ namespace orez.argfmt {
 		/// </summary>
 		public Fn Param = (o, d, di, s, si) => {
 			bool v = di == 0; string k = v ? "" : s[si];
-			for(int i = 0; i < o.Fmt.Count; i++) {
+			if(o.Fmt != null) for(int i = 0; i < o.Fmt.Count; i++) {
 				IList<object> l = o.Fmt[i];
 				if(l.Contains(k)) return ((Fn)l[l.Count - 1])(o, d, v ? 0 : i, s, v ? si : si + 1);
 			}
